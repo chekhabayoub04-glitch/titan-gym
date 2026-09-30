@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f1115" />
+  <meta name="description" content="لوحة إدارة المشتركين والاشتراكات في Titan Gym." />
+  <title>لوحة الإدارة | TITAN GYM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="admin.js?v=6" defer></script>
+</head>
+<body>
+  <!-- Client-side convenience gate; protect real admin data with server-side authentication. -->
+  <div class="auth-gate" id="authGate" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-describedby="authDescription">
+    <form class="auth-panel" id="authForm">
+      <a class="brand brand-auth" href="index.html" aria-label="Titan Gym، الصفحة الرئيسية">
+        <span class="brand-mark"><i class="fa-solid fa-dumbbell" aria-hidden="true"></i></span>
+        <span class="brand-name">TITAN <b>GYM</b></span>
+      </a>
+      <span class="eyebrow">مساحة إدارية محمية</span>
+      <h1 id="authTitle">مرحباً بعودتك</h1>
+      <p id="authDescription">أدخل رمز المرور للمتابعة إلى لوحة الإدارة.</p>
+      <label for="adminPasscode">رمز المرور</label>
+      <div class="password-field">
+        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+        <input id="adminPasscode" name="passcode" type="password" inputmode="numeric" autocomplete="current-password" required aria-describedby="authError" autofocus />
+      </div>
+      <p class="form-error" id="authError" role="alert" aria-live="polite"></p>
+      <button class="button button-primary button-wide" type="submit">دخول إلى لوحة الإدارة <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>
+      <a class="auth-back" href="index.html"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> العودة إلى الموقع</a>
+    </form>
+  </div>
+
+  <!-- Dashboard shell stays hidden until this browser session passes the gate. -->
+  <div class="app-shell" id="appShell" hidden>
+    <aside class="sidebar" id="sidebar" aria-label="القائمة الرئيسية">
+      <a class="brand" href="index.html" aria-label="Titan Gym، الصفحة الرئيسية">
+        <span class="brand-mark"><i class="fa-solid fa-dumbbell" aria-hidden="true"></i></span>
+        <span class="brand-name">TITAN <b>GYM</b><small>إدارة الصالة</small></span>
+      </a>
+
+      <span class="side-label">مساحة العمل</span>
+      <nav class="side-nav" aria-label="التنقل في لوحة الإدارة">
+        <a class="side-link is-current" href="#overview" aria-current="page"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i> نظرة عامة</a>
+        <a class="side-link" href="#members"><i class="fa-solid fa-users" aria-hidden="true"></i> المشتركين</a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <a class="side-link" href="index.html"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> العودة إلى الموقع</a>
+        <button class="side-link logout-button" id="logoutButton" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> تسجيل الخروج</button>
+        <div class="side-footnote"><span class="status-dot"></span> لوحة TITAN GYM <span>·</span> الجزائر</div>
+      </div>
+    </aside>
+
+    <main class="workspace" id="mainContent" tabindex="-1">
+      <header class="topbar">
+        <button class="icon-button menu-toggle" id="menuToggle" type="button" aria-label="فتح القائمة" aria-expanded="false" aria-controls="sidebar"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <div class="topbar-context"><span class="topbar-kicker">مركز الإدارة</span><span class="topbar-title">لوحة التحكم</span></div>
+        <div class="topbar-meta"><span class="live-indicator"><span></span> مباشر</span><time id="todayDate"></time></div>
+      </header>
+
+      <div class="content-wrap">
+        <section class="welcome-row" id="overview" aria-labelledby="welcomeTitle">
+          <div>
+            <p class="eyebrow">إدارة الأعضاء والاشتراكات</p>
+            <h1 id="welcomeTitle">صباح القوة، <span>مدير الصالة</span></h1>
+            <p class="welcome-subtitle">إليك ملخص نشاط Titan Gym اليوم.</p>
+          </div>
+          <div class="welcome-actions">
+            <button class="button button-primary" id="openMemberDialog" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> إضافة مشترك جديد</button>
+            <button id="export-csv-btn" class="secondary-btn" type="button" onclick="exportMembersToCSV()">📥 تصدير إلى Excel (CSV)</button>
+          </div>
+        </section>
+
+        <!-- KPI values are calculated from the current member records in admin.js. -->
+        <section class="stats-grid" aria-label="ملخص مؤشرات الصالة">
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-icon gold-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span><span class="stat-caption">قاعدة الأعضاء</span></div>
+            <p class="stat-value" id="totalMembers">0</p>
+            <h2>إجمالي المشتركين</h2>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-icon green-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span><span class="stat-caption">اشتراك ساري</span></div>
+            <p class="stat-value" id="activeMembers">0</p>
+            <h2>الاشتراكات النشطة</h2>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-icon amber-icon"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i></span><span class="stat-caption">خلال 7 أيام</span></div>
+            <p class="stat-value" id="expiringMembers">0</p>
+            <h2>تنتهي قريباً</h2>
+          </article>
+          <article class="stat-card revenue-card">
+            <div class="stat-top"><span class="stat-icon red-icon"><i class="fa-solid fa-wallet" aria-hidden="true"></i></span><span class="stat-caption">قيمة الخطط المسجلة</span></div>
+            <p class="stat-value revenue-value" id="totalRevenue">0 <small>دج</small></p>
+            <h2>الدخل الإجمالي التقديري</h2>
+          </article>
+        </section>
+
+        <section class="members-section" id="members" aria-labelledby="membersTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">السجل الكامل</p>
+              <h2 id="membersTitle">إدارة المشتركين</h2>
+            </div>
+            <span class="member-count" id="visibleCount" aria-live="polite">0 مشترك</span>
+          </div>
+
+          <div class="table-toolbar">
+            <label class="search-box" for="memberSearch">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <span class="visually-hidden">ابحث بالاسم أو رقم الهاتف</span>
+              <input id="memberSearch" type="search" placeholder="ابحث بالاسم أو رقم الهاتف..." autocomplete="off" />
+              <kbd>/</kbd>
+            </label>
+            <span class="table-hint"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> تتحدث البيانات تلقائياً</span>
+          </div>
+
+          <div class="table-scroll" tabindex="0" aria-label="جدول المشتركين، مرر أفقياً على الشاشات الصغيرة">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">المشترك</th>
+                  <th scope="col">رقم الهاتف</th>
+                  <th scope="col">الخطة</th>
+                  <th scope="col">تاريخ البداية</th>
+                  <th scope="col">تاريخ الانتهاء</th>
+                  <th scope="col">الحالة</th>
+                  <th scope="col"><span class="visually-hidden">الإجراءات</span></th>
+                </tr>
+              </thead>
+              <tbody id="membersTableBody"></tbody>
+            </table>
+            <div class="empty-state" id="emptyState" hidden>
+              <span class="empty-icon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></span>
+              <h3 id="emptyTitle">لا يوجد مشتركون بعد</h3>
+              <p id="emptyMessage">أضف أول مشترك لبدء إدارة سجلات الصالة.</p>
+              <button class="button button-secondary" id="emptyAddButton" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> إضافة مشترك</button>
+            </div>
+          </div>
+        </section>
+
+        <footer class="page-footer"><span>TITAN GYM</span><span>إدارة أقوى. نتائج أفضل.</span></footer>
+      </div>
+    </main>
+  </div>
+
+  <!-- The same accessible dialog is used for both creating and editing a member. -->
+  <dialog class="member-dialog" id="memberDialog" aria-labelledby="dialogTitle">
+    <form class="dialog-form" id="memberForm">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">سجل الصالة</p><h2 id="dialogTitle">إضافة مشترك جديد</h2></div>
+        <button class="icon-button dialog-close" id="closeMemberDialog" type="button" aria-label="إغلاق النافذة"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </div>
+      <p class="dialog-intro">أدخل بيانات المشترك واختر خطة الاشتراك لحساب تاريخ الانتهاء تلقائياً.</p>
+      <div class="form-grid">
+        <div class="field field-full">
+          <label for="memberName">الاسم الكامل <span>*</span></label>
+          <input id="memberName" name="name" type="text" autocomplete="name" minlength="2" maxlength="80" required placeholder="مثال: محمد أمين بن صالح" />
+        </div>
+        <div class="field field-full">
+          <label for="memberPhone">رقم الهاتف <span>*</span></label>
+          <input id="memberPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" minlength="6" maxlength="24" required placeholder="مثال: 0550 12 34 56" />
+        </div>
+        <div class="field field-full">
+          <label for="member-plan">خطة الاشتراك <span>*</span></label>
+          <select id="member-plan" name="planId" required>
+            <option value="one-month" data-days="30" data-price="3000" selected>اشتراك شهر — 3,000 دج / 30 يوماً</option>
+            <option value="two-months" data-days="60" data-price="5500">اشتراك شهرين — 5,500 دج / 60 يوماً</option>
+            <option value="three-months" data-days="90" data-price="7500">اشتراك 3 أشهر — 7,500 دج / 90 يوماً</option>
+            <option value="six-months" data-days="180" data-price="14000">اشتراك 6 أشهر — 14,000 دج / 180 يوماً</option>
+            <option value="vip-year" data-days="365" data-price="25000">اشتراك سنة كاملة VIP — 25,000 دج / 365 يوماً</option>
+          </select>
+          <span class="field-note" id="planSummary">مدة الاشتراك 30 يوماً · 3,500 دج</span>
+        </div>
+        <div class="field field-full">
+          <label for="startDate">تاريخ بداية الاشتراك <span>*</span></label>
+          <input id="startDate" name="startDate" type="date" required />
+        </div>
+      </div>
+      <p class="form-error dialog-error" id="memberFormError" role="alert" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button class="button button-secondary" id="cancelMemberDialog" type="button">إلغاء</button>
+        <button class="button button-primary" id="saveMemberButton" type="submit"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> حفظ المشترك</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

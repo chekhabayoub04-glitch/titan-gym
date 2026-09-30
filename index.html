@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TITAN GYM | درارية · الجزائر العاصمة</title>
+  <meta name="description" content="أفضل صالة رياضية في الجزائر العاصمة - درارية. تدريب احترافي للرجال والنساء. اشترك الآن!" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@300;400;600;700;900&family=Barlow+Condensed:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-logo">T</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+    <span class="loader-text">TITAN GYM</span>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-container">
+    <a href="#home" class="nav-logo">
+      <span class="logo-icon"><i class="fas fa-dumbbell"></i></span>
+      <span class="logo-text">TITAN<span class="red">GYM</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#home">الرئيسية</a></li>
+      <li><a href="#about">عن الصالة</a></li>
+      <li><a href="#schedule">البرامج</a></li>
+      <li><a href="#class-schedule">جدول الحصص</a></li>
+      <li><a href="#fitness-calculator">حاسبة السعرات</a></li>
+    </ul>
+    <a href="#join-section" class="nav-cta" data-open-join>انضم اليوم <span>JOIN NOW</span><i class="fas fa-arrow-left" aria-hidden="true"></i></a>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home">الرئيسية</a>
+    <a href="#about">عن الصالة</a>
+    <a href="#schedule">البرامج</a>
+    <a href="#class-schedule">جدول الحصص</a>
+    <a href="#fitness-calculator">حاسبة السعرات</a>
+    <a href="#join-section" class="mobile-cta" data-open-join>انضم اليوم / Join Now</a>
+  </div>
+</nav>
+
+<!-- HERO with real image -->
+<section id="home" class="hero">
+  <div class="hero-bg-img">
+    <img src="images/gym-hero.jpg" alt="TITAN GYM درارية" />
+  </div>
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-overlay"></div>
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span>STRENGTH</span><span class="dot">✦</span><span>DISCIPLINE</span><span class="dot">✦</span>
+      <span>RESULTS</span><span class="dot">✦</span><span>POWER</span><span class="dot">✦</span>
+      <span>TITAN GYM · درارية</span><span class="dot">✦</span>
+      <span>STRENGTH</span><span class="dot">✦</span><span>DISCIPLINE</span><span class="dot">✦</span>
+      <span>RESULTS</span><span class="dot">✦</span><span>POWER</span><span class="dot">✦</span>
+      <span>TITAN GYM · درارية</span><span class="dot">✦</span>
+    </div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-copy">
+      <div class="hero-badge"><span class="hero-badge-pulse"></span><i class="fas fa-map-marker-alt" aria-hidden="true"></i> درارية، الجزائر العاصمة</div>
+      <h1 class="hero-title">
+        <span class="hero-line-1">تجاوز حدودك</span>
+        <span class="hero-line-2">مع <span class="red-glow">تيتان جيم</span></span>
+      </h1>
+      <p class="hero-sub">أجهزة احترافية، تدريب مخصص في كمال الأجسام والكاليسثينكس، ومدربون يساعدونك على تحويل جهدك إلى نتائج.</p>
+      <div class="hero-buttons">
+        <button type="button" class="btn-primary" data-open-join>انضم الآن <i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+        <a href="#gallery" class="btn-ghost"><span class="tour-play"><i class="fas fa-play" aria-hidden="true"></i></span> شاهد الجولة</a>
+      </div>
+      <div class="hero-proof" aria-label="أكثر من 1500 بطل يتدربون معنا وتقييم خمس نجوم">
+        <div class="proof-avatars" aria-hidden="true"><span>م</span><span>س</span><span>ع</span><span>+</span></div>
+        <div class="proof-copy"><div class="proof-stars" aria-label="5 من 5 نجوم">★★★★★</div><span>+1,500 بطل يتدربون معنا</span></div>
+      </div>
+      <div class="hero-features" aria-label="مجالات التدريب">
+        <span><i class="fas fa-dumbbell" aria-hidden="true"></i> كمال أجسام</span>
+        <span><i class="fas fa-person-running" aria-hidden="true"></i> كاليسثينكس</span>
+        <span><i class="fas fa-user-check" aria-hidden="true"></i> تدريب خاص 1-on-1</span>
+        <span><i class="fas fa-heart-pulse" aria-hidden="true"></i> لياقة بدنية</span>
+      </div>
+    </div>
+    <div class="hero-visual" aria-label="تجهيزات Titan Gym الاحترافية">
+      <div class="hero-visual-frame">
+        <img src="images/gym-machine.jpg" alt="أجهزة تدريب احترافية في Titan Gym" fetchpriority="high" />
+        <div class="hero-visual-shade"></div>
+        <span class="hero-visual-index">TITAN / TRAINING FLOOR</span>
+        <div class="hero-float-card"><span class="hero-float-icon"><i class="fas fa-bolt" aria-hidden="true"></i></span><span><strong>تدريب يصنع الفرق</strong><small>ابدأ رحلتك اليوم</small></span></div>
+      </div>
+      <span class="hero-orbit orbit-one" aria-hidden="true"></span>
+      <span class="hero-orbit orbit-two" aria-hidden="true"></span>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">
+    <span>اسحب للأسفل</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ABOUT with real image -->
+<section id="about" class="about-section">
+  <div class="about-bg-text">TITAN</div>
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-image-side" data-aos="fade-left">
+        <div class="about-img-frame">
+          <img src="images/gym-machine.jpg" alt="أجهزة TITAN GYM" class="about-main-img" />
+          <div class="about-img-overlay"></div>
+          <div class="about-badge-float">
+            <i class="fas fa-trophy"></i>
+            <span>#1 في درارية</span>
+          </div>
+          <div class="about-stat-box">
+            <span class="asb-brand">Hammer Strength</span>
+            <span class="asb-label">أجهزة أمريكية أصلية</span>
+          </div>
+        </div>
+      </div>
+      <div class="about-text-side" data-aos="fade-right">
+        <div class="section-eyebrow"><span></span> من نحن</div>
+        <h2 class="section-title">صالة <span class="red">TITAN GYM</span><br />درارية · الجزائر العاصمة</h2>
+        <p class="about-desc">صالة TITAN GYM هي الوجهة الأولى للتدريب الاحترافي في درارية. نوفر بيئة متكاملة بأحدث أجهزة Hammer Strength الأمريكية مع كوادر من المدربين المعتمدين دولياً.</p>
+        <p class="about-desc">طابقان مجهزان بالكامل، إضاءة احترافية، أجواء تحفيزية لا مثيل لها في الجزائر العاصمة. هنا تتحول الأحلام إلى نتائج.</p>
+        <div class="about-features">
+          <div class="af-item"><i class="fas fa-check-circle"></i> أجهزة Hammer Strength الأصلية</div>
+          <div class="af-item"><i class="fas fa-check-circle"></i> طابقان مجهزان بالكامل</div>
+          <div class="af-item"><i class="fas fa-check-circle"></i> قسم خاص للنساء بأيام مخصصة</div>
+          <div class="af-item"><i class="fas fa-check-circle"></i> مدربون معتمدون دولياً</div>
+          <div class="af-item"><i class="fas fa-check-circle"></i> متجر مكملات غذائية داخل الصالة</div>
+          <div class="af-item"><i class="fas fa-check-circle"></i> مواقف سيارات مجانية</div>
+        </div>
+        <a href="#contact" class="btn-primary" style="margin-top:2rem"><i class="fas fa-map-marker-alt"></i> موقعنا في درارية</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY with all 4 real images -->
+<section id="gallery" class="gallery-section">
+  <div class="container">
+    <div class="section-eyebrow center"><span></span> معرض الصالة <span></span></div>
+    <h2 class="section-title center" data-aos="fade-up">شاهد بنفسك.<br /><span class="red">المكان يتكلم.</span></h2>
+  </div>
+
+  <div class="gallery-grid" data-aos="fade-up">
+    <div class="gallery-item g-large">
+      <img src="images/gym-hall.jpg" alt="القاعة الرئيسية - نظرة شاملة" />
+      <div class="gallery-overlay">
+        <div class="go-content"><i class="fas fa-expand-alt"></i><span>القاعة الرئيسية</span></div>
+      </div>
+    </div>
+    <div class="gallery-item g-top-right">
+      <img src="images/gym-hero.jpg" alt="الطابق العلوي" />
+      <div class="gallery-overlay">
+        <div class="go-content"><i class="fas fa-expand-alt"></i><span>الطابق العلوي</span></div>
+      </div>
+    </div>
+    <div class="gallery-item g-bottom-right-1">
+      <img src="images/gym-floor.jpg" alt="منطقة التدريب" />
+      <div class="gallery-overlay">
+        <div class="go-content"><i class="fas fa-expand-alt"></i><span>منطقة التدريب</span></div>
+      </div>
+    </div>
+    <div class="gallery-item g-bottom-right-2">
+      <img src="images/gym-machine.jpg" alt="أجهزة Hammer Strength" />
+      <div class="gallery-overlay">
+        <div class="go-content"><i class="fas fa-expand-alt"></i><span>Hammer Strength</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-stats-bar" data-aos="fade-up">
+    <div class="gsb-item"><i class="fas fa-layer-group"></i><span>طابقان</span><small>للتدريب</small></div>
+    <div class="gsb-item"><i class="fas fa-dumbbell"></i><span>50+</span><small>جهاز احترافي</small></div>
+    <div class="gsb-item"><i class="fas fa-ruler-combined"></i><span>800m²</span><small>مساحة التدريب</small></div>
+    <div class="gsb-item"><i class="fas fa-snowflake"></i><span>تكييف</span><small>مركزي كامل</small></div>
+    <div class="gsb-item"><i class="fas fa-wifi"></i><span>WiFi</span><small>مجاني</small></div>
+  </div>
+</section>
+
+<!-- GENDER SECTIONS -->
+<section id="schedule" class="gender-section">
+  <div class="container">
+    <div class="section-eyebrow center"><span></span> برامجنا المتخصصة <span></span></div>
+    <h2 class="section-title center" data-aos="fade-up">قسمان منفصلان.<br /><span class="red">راحة تامة.</span></h2>
+  </div>
+  <div class="gender-cards" id="class-schedule">
+    <div class="gender-card men-card" data-aos="fade-right">
+      <div class="gc-bg-img"><img src="images/gym-hall.jpg" alt="قسم الرجال" /></div>
+      <div class="gc-overlay-dark"></div>
+      <div class="gc-content">
+        <div class="gc-icon"><i class="fas fa-mars"></i></div>
+        <h3>قسم الرجال</h3>
+        <p>تدريب مكثف بأجهزة Hammer Strength + منطقة كارديو متكاملة + طابق علوي للرفع الحر</p>
+        <div class="schedule-table">
+          <div class="sch-title"><i class="fas fa-calendar-check"></i> أيام العمل</div>
+          <div class="open-days">
+            <span>السبت</span><span>الأحد</span><span>الاثنين</span><span>الثلاثاء</span>
+            <span>الأربعاء</span><span>الخميس</span><span>الجمعة</span>
+          </div>
+          <div class="sch-hours"><i class="fas fa-clock"></i> 07:00 → 22:30</div>
+          <div class="sch-note open-note"><i class="fas fa-check"></i> مفتوح يومياً بما فيها الجمعة</div>
+        </div>
+        <div class="gc-features">
+          <span><i class="fas fa-dumbbell"></i> رفع أثقال</span>
+          <span><i class="fas fa-running"></i> كارديو</span>
+          <span><i class="fas fa-fire"></i> CrossFit</span>
+          <span><i class="fas fa-user-tie"></i> مدرب شخصي</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="gender-card women-card" data-aos="fade-left">
+      <div class="gc-bg-img"><img src="images/gym-floor.jpg" alt="قسم النساء" /></div>
+      <div class="gc-overlay-dark women-dark"></div>
+      <div class="gc-content">
+        <div class="gc-icon women-icon"><i class="fas fa-venus"></i></div>
+        <h3>قسم النساء</h3>
+        <p>بيئة آمنة ومغلقة بالكامل للسيدات - أيام مخصصة مع مدربات متخصصات</p>
+        <div class="schedule-table women-schedule">
+          <div class="sch-title"><i class="fas fa-calendar-check"></i> أيام خاصة بالنساء</div>
+          <div class="women-days-grid">
+            <div class="wd-item"><span class="day-name">الثلاثاء</span><span class="day-time">مساءً فقط</span><span class="day-hours">17:00 → 21:00</span></div>
+            <div class="wd-item"><span class="day-name">الجمعة</span><span class="day-time">يوم كامل</span><span class="day-hours">09:00 → 20:00</span></div>
+            <div class="wd-item"><span class="day-name">السبت</span><span class="day-time">يوم كامل</span><span class="day-hours">09:00 → 20:00</span></div>
+          </div>
+          <div class="sch-note women-note"><i class="fas fa-lock"></i> قسم مغلق بالكامل للنساء في هذه الأيام</div>
+        </div>
+        <div class="gc-features women-features">
+          <span><i class="fas fa-heart"></i> Pilates</span>
+          <span><i class="fas fa-music"></i> Zumba</span>
+          <span><i class="fas fa-spa"></i> يوغا</span>
+          <span><i class="fas fa-female"></i> تشكيل</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing-section">
+  <div class="pricing-bg-img">
+    <img src="images/gym-hall.jpg" alt="" />
+    <div class="pricing-img-overlay"></div>
+  </div>
+  <div class="container" style="position:relative;z-index:2;">
+    <div class="section-eyebrow center"><span></span> الاشتراكات <span></span></div>
+    <h2 class="section-title center" data-aos="fade-up">اختر خطتك.<br /><span class="red">ابدأ تحولك.</span></h2>
+    <p class="section-sub center" data-aos="fade-up">جميع الاشتراكات تشمل دخول كامل + خزانة مجانية</p>
+    <div class="pricing-grid">
+      <div class="price-card" data-aos="fade-up" data-aos-delay="0">
+        <div class="pc-badge">تجربة</div>
+        <div class="pc-icon"><i class="fas fa-seedling"></i></div>
+        <h3>أسبوع</h3>
+        <div class="pc-price"><span class="currency">DZD</span><span class="amount">1,200</span></div>
+        <ul class="pc-features">
+          <li><i class="fas fa-check"></i> دخول كامل 7 أيام</li>
+          <li><i class="fas fa-check"></i> جميع الأجهزة</li>
+          <li><i class="fas fa-check"></i> خزانة مجانية</li>
+          <li><i class="fas fa-times muted"></i> مدرب شخصي</li>
+          <li><i class="fas fa-times muted"></i> برنامج تغذية</li>
+        </ul>
+        <a href="#contact" class="pc-btn">اشترك الآن</a>
+      </div>
+      <div class="price-card" data-aos="fade-up" data-aos-delay="80">
+        <div class="pc-badge">شعبي</div>
+        <div class="pc-icon"><i class="fas fa-calendar-alt"></i></div>
+        <h3>شهر كامل</h3>
+        <div class="pc-price"><span class="currency">DZD</span><span class="amount">3,500</span></div>
+        <ul class="pc-features">
+          <li><i class="fas fa-check"></i> دخول كامل 30 يوم</li>
+          <li><i class="fas fa-check"></i> جميع الأجهزة</li>
+          <li><i class="fas fa-check"></i> خزانة مجانية</li>
+          <li><i class="fas fa-check"></i> تقييم جسم مجاني</li>
+          <li><i class="fas fa-times muted"></i> مدرب شخصي</li>
+        </ul>
+        <a href="#contact" class="pc-btn">اشترك الآن</a>
+      </div>
+      <div class="price-card featured-card" data-aos="fade-up" data-aos-delay="140">
+        <div class="pc-badge best">⭐ الأفضل قيمة</div>
+        <div class="pc-icon"><i class="fas fa-crown"></i></div>
+        <h3>3 أشهر</h3>
+        <div class="pc-price">
+          <span class="currency">DZD</span><span class="amount">9,000</span>
+          <div class="saving-badge">وفّر 1,500 DA</div>
+        </div>
+        <ul class="pc-features">
+          <li><i class="fas fa-check"></i> دخول كامل 90 يوم</li>
+          <li><i class="fas fa-check"></i> جميع الأجهزة + القاعات</li>
+          <li><i class="fas fa-check"></i> خزانة مجانية</li>
+          <li><i class="fas fa-check"></i> تقييم جسم + متابعة</li>
+          <li><i class="fas fa-check"></i> جلسة مدرب مجانية</li>
+        </ul>
+        <a href="#contact" class="pc-btn featured-btn">اشترك الآن</a>
+      </div>
+      <div class="price-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="pc-badge">موفّر</div>
+        <div class="pc-icon"><i class="fas fa-medal"></i></div>
+        <h3>6 أشهر</h3>
+        <div class="pc-price">
+          <span class="currency">DZD</span><span class="amount">16,000</span>
+          <div class="saving-badge">وفّر 5,000 DA</div>
+        </div>
+        <ul class="pc-features">
+          <li><i class="fas fa-check"></i> دخول كامل 180 يوم</li>
+          <li><i class="fas fa-check"></i> جميع الأجهزة + القاعات</li>
+          <li><i class="fas fa-check"></i> خزانة مجانية دائمة</li>
+          <li><i class="fas fa-check"></i> متابعة شهرية</li>
+          <li><i class="fas fa-check"></i> جلستا مدرب مجانيتان</li>
+        </ul>
+        <a href="#contact" class="pc-btn">اشترك الآن</a>
+      </div>
+      <div class="price-card gold-card" data-aos="fade-up" data-aos-delay="260">
+        <div class="pc-badge elite">🏆 ELITE</div>
+        <div class="pc-icon gold-icon"><i class="fas fa-gem"></i></div>
+        <h3>عام كامل</h3>
+        <div class="pc-price">
+          <span class="currency">DZD</span><span class="amount">28,000</span>
+          <div class="saving-badge gold-save">وفّر 14,000 DA 🔥</div>
+        </div>
+        <ul class="pc-features">
+          <li><i class="fas fa-check"></i> دخول كامل 365 يوم</li>
+          <li><i class="fas fa-check"></i> جميع الأجهزة + القاعات</li>
+          <li><i class="fas fa-check"></i> خزانة شخصية مدفوعة</li>
+          <li><i class="fas fa-check"></i> متابعة أسبوعية</li>
+          <li><i class="fas fa-check"></i> برنامج تغذية مخصص</li>
+          <li><i class="fas fa-check"></i> تقارير تقدم شهرية</li>
+          <li><i class="fas fa-check"></i> أولوية حجز الجلسات</li>
+        </ul>
+        <a href="#contact" class="pc-btn gold-btn">اشترك الآن</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPLEMENTS -->
+<section id="supplements" class="supplements-section">
+  <div class="container">
+    <div class="section-eyebrow center"><span></span> متجر المكملات <span></span></div>
+    <h2 class="section-title center" data-aos="fade-up">مكملات <span class="red">أصلية 100%</span></h2>
+    <p class="section-sub center">متوفرة داخل الصالة - ماركات عالمية معتمدة</p>
+    <div class="supp-hero" data-aos="fade-up">
+      <div class="supp-hero-badge">🔬 الأكثر مبيعاً</div>
+      <div class="supp-hero-grid">
+        <div class="supp-hero-visual">
+          <div class="product-3d">
+            <div class="product-can">
+              <div class="can-body">
+                <div class="can-label">
+                  <span class="can-brand">BioTech USA</span>
+                  <span class="can-name">CREATINE</span>
+                  <span class="can-sub">MONOHYDRATE</span>
+                  <span class="can-weight">300g</span>
+                </div>
+              </div>
+              <div class="can-lid"></div>
+              <div class="can-bottom"></div>
+              <div class="can-shine"></div>
+            </div>
+          </div>
+        </div>
+        <div class="supp-hero-info">
+          <div class="brand-tag"><i class="fas fa-certificate"></i> BioTech USA - الأصلي</div>
+          <h3>Creatine Monohydrate</h3>
+          <p class="supp-desc">الكرياتين مونوهيدرات الأنقى على الإطلاق. يزيد القوة والقدرة على التحمل ويسرع الانتعاش بعد التمرين. مجرب علمياً منذ 30 سنة.</p>
+          <div class="dose-selector">
+            <div class="dose-title"><i class="fas fa-flask"></i> اختر حجم الدوزة</div>
+            <div class="dose-cards">
+              <div class="dose-card active" onclick="selectDose(this, 10)">
+                <span class="dose-g">10g</span><span class="dose-label">للمبتدئين</span><span class="dose-price">DZD 850</span>
+              </div>
+              <div class="dose-card" onclick="selectDose(this, 15)">
+                <span class="dose-g">15g</span><span class="dose-label">للمتقدمين</span><span class="dose-price">DZD 1,100</span>
+              </div>
+            </div>
+          </div>
+          <div class="dose-detail">
+            <div class="dd-row"><i class="fas fa-info-circle"></i><span>الدوزة: <strong id="doseGrams">10 جرام</strong> يومياً</span></div>
+            <div class="dd-row"><i class="fas fa-clock"></i><span>التوقيت: بعد التمرين مباشرة مع عصير</span></div>
+            <div class="dd-row"><i class="fas fa-calendar"></i><span>الدورة: 4 أسابيع ثم استراحة أسبوع</span></div>
+            <div class="dd-row"><i class="fas fa-tint"></i><span>مع الماء: 300-400 مل ماء على الأقل</span></div>
+          </div>
+          <div class="supp-sizes">
+            <div class="size-opt"><span>300g</span><span class="sp">DZD 2,800</span></div>
+            <div class="size-opt"><span>500g</span><span class="sp">DZD 4,200</span></div>
+            <div class="size-opt featured-size"><span>1000g</span><span class="sp">DZD 7,500</span><span class="best-val">الأفضل</span></div>
+          </div>
+          <a href="#contact" class="btn-primary"><i class="fas fa-shopping-bag"></i> اطلب الآن</a>
+        </div>
+      </div>
+    </div>
+    <div class="supp-grid">
+      <div class="supp-card" data-aos="fade-up" data-aos-delay="0">
+        <div class="sc-badge">Whey Protein</div><div class="sc-icon">🥛</div>
+        <h4>Whey Protein Isolate</h4><p>25g بروتين لكل دوزة - بناء العضلات بسرعة</p>
+        <div class="sc-flavors"><span>Chocolate</span><span>Vanilla</span><span>Strawberry</span></div>
+        <div class="sc-price">من <strong>DZD 4,500</strong> / 1kg</div>
+        <a href="#contact" class="sc-btn">اطلب الآن</a>
+      </div>
+      <div class="supp-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="sc-badge">Pre-Workout</div><div class="sc-icon">⚡</div>
+        <h4>Pre-Workout Extreme</h4><p>طاقة انفجارية + تركيز + مضخة دم قوية</p>
+        <div class="sc-flavors"><span>Fruit Punch</span><span>Blue Raspberry</span></div>
+        <div class="sc-price">من <strong>DZD 3,200</strong> / 300g</div>
+        <a href="#contact" class="sc-btn">اطلب الآن</a>
+      </div>
+      <div class="supp-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="sc-badge">BCAA</div><div class="sc-icon">💊</div>
+        <h4>BCAA 8000</h4><p>الأحماض الأمينية المتشعبة - منع هدم العضلات</p>
+        <div class="sc-flavors"><span>Watermelon</span><span>Cola</span></div>
+        <div class="sc-price">من <strong>DZD 2,800</strong> / 250g</div>
+        <a href="#contact" class="sc-btn">اطلب الآن</a>
+      </div>
+      <div class="supp-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="sc-badge">Fat Burner</div><div class="sc-icon">🔥</div>
+        <h4>Thermo Drine Pro</h4><p>حرق الدهون + تسريع الأيض + طاقة عالية</p>
+        <div class="sc-flavors"><span>Capsule</span><span>60 caps</span></div>
+        <div class="sc-price">من <strong>DZD 2,500</strong> / علبة</div>
+        <a href="#contact" class="sc-btn">اطلب الآن</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact-section">
+  <div class="container">
+    <div class="section-eyebrow center"><span></span> تواصل معنا <span></span></div>
+    <h2 class="section-title center" data-aos="fade-up">زرنا اليوم.<br /><span class="red">ابدأ غداً.</span></h2>
+    <div class="contact-grid">
+      <div class="contact-info" data-aos="fade-right">
+        <div class="ci-item">
+          <div class="ci-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="ci-text"><h4>الموقع</h4><p>درارية، الجزائر العاصمة</p><p>بالقرب من المركز التجاري</p></div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon"><i class="fas fa-phone-alt"></i></div>
+          <div class="ci-text"><h4>الهاتف</h4><p dir="ltr">+213 555 000 000</p><p dir="ltr">+213 661 000 000</p></div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon"><i class="fas fa-clock"></i></div>
+          <div class="ci-text"><h4>ساعات العمل</h4><p>السبت → الخميس: 07:00 - 22:30</p><p>الجمعة: 09:00 - 20:00 (نساء فقط)</p></div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon"><i class="fab fa-instagram"></i></div>
+          <div class="ci-text"><h4>تواصل اجتماعي</h4><p>@TitanGym.DZ</p></div>
+        </div>
+        <div class="social-links">
+          <a href="#" class="sl-btn fb"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="sl-btn ig"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="sl-btn wa"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="sl-btn tg"><i class="fab fa-telegram"></i></a>
+        </div>
+      </div>
+      <div class="contact-form-side" data-aos="fade-left">
+        <div class="cf-card">
+          <h3><i class="fas fa-envelope"></i> أرسل لنا رسالة</h3>
+          <div class="cf-form">
+            <div class="cf-group"><input type="text" placeholder="الاسم الكامل" class="cf-input" /></div>
+            <div class="cf-group"><input type="tel" placeholder="رقم الهاتف" class="cf-input" dir="ltr" /></div>
+            <div class="cf-group">
+              <select class="cf-input">
+                <option>اختر نوع الاشتراك</option>
+                <option>أسبوع - 1,200 DZD</option>
+                <option>شهر - 3,500 DZD</option>
+                <option>3 أشهر - 9,000 DZD</option>
+                <option>6 أشهر - 16,000 DZD</option>
+                <option>سنة - 28,000 DZD</option>
+              </select>
+            </div>
+            <div class="cf-group"><textarea placeholder="رسالتك أو استفسارك..." class="cf-input cf-textarea"></textarea></div>
+            <button class="cf-submit btn-primary"><i class="fas fa-paper-plane"></i> أرسل الآن</button>
+          </div>
+        </div>
+        <div class="map-placeholder">
+          <div class="map-inner">
+            <div class="map-pin"><i class="fas fa-map-marker-alt"></i></div>
+            <p>درارية، الجزائر العاصمة</p>
+            <a href="https://maps.google.com/?q=Draria,Algiers" target="_blank" class="map-link">
+              <i class="fas fa-external-link-alt"></i> فتح في خرائط Google
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FITNESS CALCULATOR: interactive estimate placed immediately before public registration. -->
+<section id="fitness-calculator" class="fitness-calculator" dir="rtl" lang="ar" aria-labelledby="fitnessTitle">
+  <div class="container">
+    <div class="fitness-heading">
+      <div>
+        <p class="fitness-eyebrow"><span></span> أرقام أوضح. خطة أذكى.</p>
+        <h2 id="fitnessTitle">حاسبة اللياقة <strong>والسعرات الذكية</strong></h2>
+        <p>قدّر احتياجك اليومي من السعرات والماكروز بناءً على بياناتك ونمط نشاطك.</p>
+      </div>
+      <span class="fitness-heading-mark" aria-hidden="true"><i class="fas fa-chart-line"></i></span>
+    </div>
+
+    <div class="fitness-layout">
+      <form class="fitness-form" id="fitness-form">
+        <div class="fitness-form-heading">
+          <span>بياناتك</span>
+          <small><i class="fas fa-lock" aria-hidden="true"></i> حساب محلي في متصفحك</small>
+        </div>
+        <fieldset class="fitness-fieldset">
+          <legend>الجنس</legend>
+          <div class="fitness-gender-options">
+            <label class="fitness-gender-option"><input type="radio" name="gender" value="male" checked required /><span><i class="fas fa-mars" aria-hidden="true"></i> ذكر</span></label>
+            <label class="fitness-gender-option"><input type="radio" name="gender" value="female" required /><span><i class="fas fa-venus" aria-hidden="true"></i> أنثى</span></label>
+          </div>
+        </fieldset>
+        <div class="fitness-input-grid">
+          <div class="fitness-field">
+            <label for="fitnessAge">العمر <small>سنوات</small></label>
+            <input id="fitnessAge" name="age" type="number" min="15" max="100" step="1" inputmode="numeric" required placeholder="مثال: 28" />
+          </div>
+          <div class="fitness-field">
+            <label for="fitnessHeight">الطول <small>سم</small></label>
+            <input id="fitnessHeight" name="height" type="number" min="120" max="230" step="1" inputmode="decimal" required placeholder="مثال: 175" />
+          </div>
+          <div class="fitness-field">
+            <label for="fitnessWeight">الوزن <small>كغ</small></label>
+            <input id="fitnessWeight" name="weight" type="number" min="35" max="250" step="0.1" inputmode="decimal" required placeholder="مثال: 78" />
+          </div>
+          <div class="fitness-field">
+            <label for="fitnessActivity">مستوى النشاط</label>
+            <select id="fitnessActivity" name="activity" required>
+              <option value="" selected disabled>اختر مستوى نشاطك</option>
+              <option value="sedentary">خامل · تمارين قليلة أو معدومة</option>
+              <option value="light">نشاط خفيف · 1 إلى 3 أيام أسبوعياً</option>
+              <option value="moderate">نشاط متوسط · 3 إلى 5 أيام أسبوعياً</option>
+              <option value="intense">نشاط مكثف · 6 إلى 7 أيام أسبوعياً</option>
+            </select>
+          </div>
+          <div class="fitness-field fitness-field-wide">
+            <label for="fitnessGoal">هدفك الحالي</label>
+            <select id="fitnessGoal" name="goal" required>
+              <option value="" selected disabled>اختر هدفك</option>
+              <option value="fat-loss">تنشيف وحرق دهون</option>
+              <option value="muscle-gain">بناء وتضخيم عضلات</option>
+              <option value="maintenance">الحفاظ على الوزن</option>
+            </select>
+          </div>
+        </div>
+        <p class="fitness-form-error" id="fitnessFormError" role="alert" aria-live="polite"></p>
+        <button class="fitness-submit" type="submit"><i class="fas fa-calculator" aria-hidden="true"></i> احسب احتياجك اليومي</button>
+      </form>
+
+      <section class="fitness-results" id="fitnessResults" aria-labelledby="fitnessResultsTitle" aria-live="polite" hidden>
+        <div class="fitness-results-topline"><span><i class="fas fa-bolt" aria-hidden="true"></i> ملخصك اليومي</span><span class="fitness-live-dot">تقديري</span></div>
+        <h3 id="fitnessResultsTitle">مؤشراتك وخطتك</h3>
+        <div class="fitness-primary-metrics">
+          <article class="fitness-calorie-card"><span>سعرات المحافظة</span><strong id="maintenanceCalories">—</strong><small>سعرة / يوم</small></article>
+          <article class="fitness-calorie-card fitness-target-card"><span>هدفك اليومي</span><strong id="targetCalories">—</strong><small>سعرة / يوم</small></article>
+        </div>
+        <div class="fitness-bmi-row">
+          <span class="fitness-bmi-label">مؤشر كتلة الجسم BMI</span>
+          <strong class="fitness-bmi-value" id="bmiValue">—</strong>
+          <span class="fitness-bmi-badge" id="bmiCategory">—</span>
+        </div>
+        <div class="fitness-macros-heading"><span>توزيع الماكروز المقترح</span><small>غرام / يوم</small></div>
+        <div class="fitness-macros-grid">
+          <article class="fitness-macro-card protein-card"><span>بروتين</span><strong id="proteinGrams">—</strong><small>غ</small></article>
+          <article class="fitness-macro-card carbs-card"><span>كربوهيدرات</span><strong id="carbsGrams">—</strong><small>غ</small></article>
+          <article class="fitness-macro-card fats-card"><span>دهون</span><strong id="fatsGrams">—</strong><small>غ</small></article>
+        </div>
+        <p class="fitness-disclaimer">هذه تقديرات تعليمية وليست تشخيصاً طبياً أو بديلاً عن استشارة مختص.</p>
+        <button class="fitness-cta" id="fitnessJoinCta" type="button"><span>ابدأ خطتك في تيتان جيم بهذا الهدف</span><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+      </section>
+    </div>
+  </div>
+</section>
+
+<!-- PUBLIC REGISTRATION: inserted between contact details and the site footer. -->
+<dialog class="join-dialog" id="joinDialog" aria-labelledby="joinTitle">
+  <button class="join-dialog-close" id="closeJoinDialog" type="button" aria-label="إغلاق نموذج التسجيل"><i class="fas fa-xmark" aria-hidden="true"></i></button>
+<section id="join-section" class="join-section" dir="rtl" lang="ar" aria-labelledby="joinTitle">
+  <div class="container join-layout">
+    <div class="join-copy">
+      <p class="join-eyebrow"><span></span> خطوتك الأولى</p>
+      <h2 id="joinTitle">ابدأ رحلتك<br /><strong>في TITAN GYM</strong></h2>
+      <p class="join-description">سجّل بياناتك واختر خطتك وهدفك التدريبي. سنجهز عضويتك لتبدأ التمرين في درارية.</p>
+      <div class="join-points">
+        <p><i class="fas fa-check" aria-hidden="true"></i> خطط واضحة وأسعار معلنة</p>
+        <p><i class="fas fa-check" aria-hidden="true"></i> تسجيل مباشر في سجل المشتركين</p>
+        <p><i class="fas fa-check" aria-hidden="true"></i> ابدأ من اليوم الذي تختاره</p>
+      </div>
+    </div>
+
+    <form class="public-join-form" id="public-join-form" novalidate>
+      <div class="join-form-heading">
+        <div>
+          <span class="join-form-kicker">نموذج العضوية</span>
+          <h3>بيانات التسجيل</h3>
+        </div>
+        <span class="join-form-mark" aria-hidden="true"><i class="fas fa-dumbbell"></i></span>
+      </div>
+
+      <div class="join-fields">
+        <div class="join-field">
+          <label for="joinName">الاسم الكامل <span>*</span></label>
+          <input id="joinName" name="name" type="text" autocomplete="name" maxlength="80" required placeholder="اكتب اسمك الكامل" />
+        </div>
+        <div class="join-field">
+          <label for="joinPhone">رقم الهاتف <span>*</span></label>
+          <input id="joinPhone" name="phone" type="tel" dir="ltr" inputmode="numeric" autocomplete="tel-national" pattern="0[567][0-9]{8}" maxlength="10" required aria-describedby="joinPhoneHint" placeholder="0550123456" />
+          <small id="joinPhoneHint">رقم جزائري يبدأ بـ 05 أو 06 أو 07، من 10 أرقام.</small>
+        </div>
+        <div class="join-field">
+          <label for="client-plan">خطة العضوية <span>*</span></label>
+          <select id="client-plan" name="plan" required>
+            <option value="" selected disabled>اختر خطة العضوية</option>
+            <option value="اشتراك شهر" data-price="3000" data-days="30">اشتراك شهر — 3,000 دج</option>
+            <option value="اشتراك شهرين" data-price="5500" data-days="60">اشتراك شهرين — 5,500 دج</option>
+            <option value="اشتراك 3 أشهر" data-price="7500" data-days="90">اشتراك 3 أشهر — 7,500 دج</option>
+            <option value="اشتراك 6 أشهر" data-price="14000" data-days="180">اشتراك 6 أشهر — 14,000 دج</option>
+            <option value="اشتراك سنة كاملة VIP" data-price="25000" data-days="365">اشتراك سنة كاملة VIP — 25,000 دج</option>
+          </select>
+        </div>
+        <div class="join-field">
+          <label for="client-goal">هدفك التدريبي <span>*</span></label>
+          <select id="client-goal" name="goal" required>
+            <option value="" selected disabled>اختر هدفك</option>
+            <option value="تضخيم وبناء عضلات">تضخيم وبناء عضلات</option>
+            <option value="بناء وتضخيم عضلات">بناء وتضخيم عضلات</option>
+            <option value="تنشيف وحرق دهون">تنشيف وحرق دهون</option>
+            <option value="كاليسثينكس ولياقة بدنية">كاليسثينكس ولياقة بدنية</option>
+            <option value="لياقة عامة">لياقة عامة</option>
+            <option value="الحفاظ على الوزن">الحفاظ على الوزن</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="join-feedback" id="joinFeedback" role="status" aria-live="polite" aria-atomic="true"></p>
+      <button class="join-submit" type="submit"><span>تأكيد التسجيل</span><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+      <p class="join-privacy"><i class="fas fa-lock" aria-hidden="true"></i> يُسجّل طلب العضوية في قاعدة Titan Gym.</p>
+    </form>
+  </div>
+</section>
+</dialog>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="fg-brand">
+          <div class="footer-logo">TITAN<span class="red">GYM</span></div>
+          <p>صالة TITAN GYM - وجهتك الأولى للتحول الجسدي في درارية، الجزائر العاصمة. أجهزة Hammer Strength.</p>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <a href="#"><i class="fab fa-tiktok"></i></a>
+          </div>
+        </div>
+        <div class="fg-links">
+          <h4>روابط سريعة</h4>
+          <a href="#home">الرئيسية</a><a href="#about">عن الصالة</a>
+          <a href="#gallery">المعرض</a><a href="#pricing">الأسعار</a>
+          <a href="#supplements">المكملات</a><a href="#join-section" data-open-join>التسجيل</a><a href="#contact">التواصل</a>
+        </div>
+        <div class="fg-links">
+          <h4>الاشتراكات</h4>
+          <a href="#pricing">أسبوع - 1,200 DA</a><a href="#pricing">شهر - 3,500 DA</a>
+          <a href="#pricing">3 أشهر - 9,000 DA</a><a href="#pricing">6 أشهر - 16,000 DA</a>
+          <a href="#pricing">سنة - 28,000 DA</a>
+        </div>
+        <div class="fg-contact">
+          <h4>تواصل</h4>
+          <p><i class="fas fa-phone"></i> +213 555 000 000</p>
+          <p><i class="fas fa-map-marker-alt"></i> درارية، الجزائر العاصمة</p>
+          <p><i class="fas fa-clock"></i> 07:00 - 22:30</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 TITAN GYM — جميع الحقوق محفوظة | درارية · الجزائر العاصمة</p>
+    <p>تصميم: <span class="red">Ayoub Chekhab</span></p>
+  </div>
+</footer>
+
+<a href="https://wa.me/213555000000" class="wa-float" target="_blank">
+  <i class="fab fa-whatsapp"></i><span>تواصل معنا</span>
+</a>
+<button class="back-to-top" id="backTop"><i class="fas fa-chevron-up"></i></button>
+<div class="join-toast" id="joinToast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<script src="js/main.js?v=7"></script>
+</body>
+</html>
