@@ -27,6 +27,16 @@
     activeMembers: document.getElementById('activeMembers'),
     expiringMembers: document.getElementById('expiringMembers'),
     totalRevenue: document.getElementById('totalRevenue'),
+    revenueTrigger: document.getElementById('revenueAnalyticsTrigger'),
+    revenueModal: document.getElementById('revenue-analytics-modal'),
+    closeRevenueModal: document.getElementById('closeRevenueModal'),
+    revenueYearSelect: document.getElementById('revenue-year-select'),
+    revenueAnnualTotal: document.getElementById('revenueAnnualTotal'),
+    revenueMonthlyAverage: document.getElementById('revenueMonthlyAverage'),
+    revenuePeakMonth: document.getElementById('revenuePeakMonth'),
+    revenueMonthlyRows: document.getElementById('revenue-monthly-rows'),
+    revenueReportCount: document.getElementById('revenueReportCount'),
+    exportRevenueCsv: document.getElementById('exportRevenueCsv'),
     search: document.getElementById('memberSearch'),
     tableBody: document.getElementById('membersTableBody'),
     emptyState: document.getElementById('emptyState'),
@@ -56,6 +66,22 @@
   let refreshPromise = null;
 
   const numberFormat = new Intl.NumberFormat('ar-DZ');
+  const REVENUE_PLAN_PRICES = {
+    'اشتراك شهر': 3000,
+    'اشتراك شهرين': 5500,
+    'اشتراك 3 أشهر': 7500,
+    'اشتراك 6 أشهر': 14000,
+    'اشتراك سنة كاملة VIP': 25000,
+    'شهر عادي': 3000,
+    'شهر كامل': 3500,
+    '3 أشهر': 7500,
+    '6 أشهر': 14000,
+    'سنة VIP': 25000,
+    'عام كامل VIP': 28000
+  };
+  const revenueMonthNames = Array.from({ length: 12 }, (_, monthIndex) => new Intl.DateTimeFormat('ar-DZ', {
+    month: 'long', timeZone: 'UTC'
+  }).format(new Date(Date.UTC(2024, monthIndex, 15))));
   const dateFormat = new Intl.DateTimeFormat('ar-DZ', {
     day: 'numeric',
     month: 'short',
@@ -321,6 +347,116 @@
     return members.filter(member => getSearchableText(member.name).includes(query) || getSearchableText(member.phone).includes(query));
   }
 
+  function getMemberStartParts(member) {
+    const startDate = String(member.startDate || member.start_date || '');
+    const parsedDate = parseLocalDate(startDate);
+    if (!parsedDate) return null;
+    return { year: parsedDate.getFullYear(), monthIndex: parsedDate.getMonth() };
+  }
+
+  function getMemberPlanName(member) {
+    return String(member.planName || member.plan || '').trim() || 'غير محددة';
+  }
+
+  function getMemberRevenue(member) {
+    const hasStoredPrice = member.price !== null && member.price !== undefined && member.price !== '';
+    const storedPrice = Number(member.price);
+    if (hasStoredPrice && Number.isFinite(storedPrice) && storedPrice >= 0) return storedPrice;
+    return REVENUE_PLAN_PRICES[getMemberPlanName(member)] || 0;
+  }
+
+  function getAvailableRevenueYears() {
+    return [...new Set(members.map(getMemberStartParts).filter(Boolean).map(parts => parts.year))]
+      .sort((first, second) => second - first);
+  }
+
+  function populateRevenueYears(years) {
+    const previousYear = Number(elements.revenueYearSelect.value);
+    elements.revenueYearSelect.replaceChildren();
+
+    if (!years.length) {
+      const emptyOption = document.createElement('option');
+      emptyOption.value = '';
+      emptyOption.textContent = 'لا توجد سنوات';
+      elements.revenueYearSelect.append(emptyOption);
+      elements.revenueYearSelect.disabled = true;
+      return;
+    }
+
+    elements.revenueYearSelect.disabled = false;
+    years.forEach(year => {
+      const option = document.createElement('option');
+      option.value = String(year);
+      option.textContent = String(year);
+      elements.revenueYearSelect.append(option);
+    });
+    elements.revenueYearSelect.value = years.includes(previousYear) ? String(previousYear) : String(years[0]);
+  }
+
+  function buildRevenueReport(year) {
+    const months = revenueMonthNames.map((name, monthIndex) => ({
+      monthIndex,
+      name,
+      memberCount: 0,
+      revenue: 0,
+      planCounts: new Map()
+    }));
+
+    members.forEach(member => {
+      const startParts = getMemberStartParts(member);
+      if (!startParts || startParts.year !== year) return;
+      const month = months[startParts.monthIndex];
+      const planName = getMemberPlanName(member);
+      month.memberCount += 1;
+      month.revenue += getMemberRevenue(member);
+      month.planCounts.set(planName, (month.planCounts.get(planName) || 0) + 1);
+    });
+
+    months.forEach(month => {
+      const topPlan = [...month.planCounts.entries()].sort((first, second) => second[1] - first[1])[0];
+      month.topPlan = topPlan ? topPlan[0] : '—';
+    });
+
+    const annualRevenue = months.reduce((sum, month) => sum + month.revenue, 0);
+    const peakMonth = months.reduce((peak, month) => month.revenue > peak.revenue ? month : peak, months[0]);
+    return {
+      year,
+      months,
+      annualRevenue,
+      monthlyAverage: Math.round(annualRevenue / 12),
+      peakMonth: peakMonth && peakMonth.revenue > 0 ? peakMonth : null,
+      memberCount: months.reduce((sum, month) => sum + month.memberCount, 0)
+    };
+  }
+
+  function renderRevenueAnalytics() {
+    const years = getAvailableRevenueYears();
+    populateRevenueYears(years);
+
+    if (!years.length) {
+      elements.revenueAnnualTotal.innerHTML = `0 <small>دج</small>`;
+      elements.revenueMonthlyAverage.innerHTML = `0 <small>دج</small>`;
+      elements.revenuePeakMonth.textContent = '—';
+      elements.revenueReportCount.textContent = '0 عضوية مسجلة';
+      elements.revenueMonthlyRows.innerHTML = '<tr><td colspan="4">لا توجد بيانات مالية بعد.</td></tr>';
+      return null;
+    }
+
+    const report = buildRevenueReport(Number(elements.revenueYearSelect.value));
+    elements.revenueAnnualTotal.innerHTML = `${numberFormat.format(report.annualRevenue)} <small>دج</small>`;
+    elements.revenueMonthlyAverage.innerHTML = `${numberFormat.format(report.monthlyAverage)} <small>دج</small>`;
+    elements.revenuePeakMonth.textContent = report.peakMonth ? report.peakMonth.name : '—';
+    elements.revenueReportCount.textContent = `${numberFormat.format(report.memberCount)} عضوية مسجلة في ${report.year}`;
+    elements.revenueMonthlyRows.innerHTML = report.months.map(month => `
+      <tr class="${month.memberCount ? '' : 'revenue-zero'}">
+        <td>${escapeHtml(month.name)}</td>
+        <td>${numberFormat.format(month.memberCount)}</td>
+        <td>${escapeHtml(month.topPlan)}</td>
+        <td>${numberFormat.format(month.revenue)}</td>
+      </tr>`).join('');
+    return report;
+  }
+
   function renderStats() {
     const today = new Date();
     const statuses = members.map(member => getMemberStatus(member, today));
@@ -373,6 +509,7 @@
   function renderAll() {
     renderStats();
     renderMembers();
+    renderRevenueAnalytics();
   }
 
   function csvField(value) {
@@ -418,6 +555,35 @@
     } catch (error) {
       console.error('Unable to export Titan Gym members:', error);
       showToast('تعذر إنشاء ملف التصدير.', true);
+    }
+  }
+
+  function exportRevenueReportCSV() {
+    const year = Number(elements.revenueYearSelect.value);
+    if (!Number.isInteger(year)) {
+      showToast('لا توجد بيانات مالية لتصديرها.', true);
+      return;
+    }
+
+    try {
+      const report = buildRevenueReport(year);
+      const headers = ['الشهر', 'عدد الأعضاء', 'أكثر خطة اشتراك', 'إجمالي الإيرادات (دج)'];
+      const rows = report.months.map(month => [month.name, month.memberCount, month.topPlan, month.revenue]);
+      const csv = `\uFEFF${[headers, ...rows].map(row => row.map(csvField).join(',')).join('\r\n')}`;
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const objectUrl = URL.createObjectURL(blob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = objectUrl;
+      downloadLink.download = `titan_revenue_${year}_${localDateString()}.csv`;
+      downloadLink.style.display = 'none';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      showToast(`تم تجهيز التقرير المالي لعام ${year}.`);
+    } catch (error) {
+      console.error('Unable to export Titan Gym financial report:', error);
+      showToast('تعذر إنشاء التقرير المالي.', true);
     }
   }
 
@@ -530,6 +696,22 @@
   document.getElementById('openMemberDialog').addEventListener('click', () => openMemberDialog());
   document.getElementById('emptyAddButton').addEventListener('click', () => openMemberDialog());
   window.exportMembersToCSV = exportMembersToCSV;
+  elements.revenueTrigger.addEventListener('click', () => {
+    renderRevenueAnalytics();
+    elements.revenueModal.showModal();
+  });
+  elements.revenueTrigger.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    renderRevenueAnalytics();
+    elements.revenueModal.showModal();
+  });
+  elements.closeRevenueModal.addEventListener('click', () => elements.revenueModal.close());
+  elements.revenueModal.addEventListener('click', event => {
+    if (event.target === elements.revenueModal) elements.revenueModal.close();
+  });
+  elements.revenueYearSelect.addEventListener('change', renderRevenueAnalytics);
+  elements.exportRevenueCsv.addEventListener('click', exportRevenueReportCSV);
   document.getElementById('closeMemberDialog').addEventListener('click', () => elements.memberDialog.close());
   document.getElementById('cancelMemberDialog').addEventListener('click', () => elements.memberDialog.close());
   elements.memberPlan.addEventListener('change', updatePlanSummary);

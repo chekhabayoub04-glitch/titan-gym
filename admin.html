@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="admin.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=6" defer></script>
+  <script src="admin.js?v=7" defer></script>
 </head>
 <body>
   <!-- Client-side convenience gate; protect real admin data with server-side authentication. -->
@@ -95,10 +95,11 @@
             <p class="stat-value" id="expiringMembers">0</p>
             <h2>تنتهي قريباً</h2>
           </article>
-          <article class="stat-card revenue-card">
+          <article class="stat-card revenue-card" id="revenueAnalyticsTrigger" role="button" tabindex="0" title="اضغط لعرض التقرير المالي المفصل" aria-label="إجمالي الإيرادات. اضغط لعرض التقرير المالي المفصل" aria-haspopup="dialog" aria-controls="revenue-analytics-modal">
             <div class="stat-top"><span class="stat-icon red-icon"><i class="fa-solid fa-wallet" aria-hidden="true"></i></span><span class="stat-caption">قيمة الخطط المسجلة</span></div>
             <p class="stat-value revenue-value" id="totalRevenue">0 <small>دج</small></p>
             <h2>الدخل الإجمالي التقديري</h2>
+            <span class="revenue-card-hint"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> التقرير المالي</span>
           </article>
         </section>
 
@@ -192,5 +193,58 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog class="revenue-modal" id="revenue-analytics-modal" aria-labelledby="revenueModalTitle">
+    <div class="revenue-modal-shell">
+      <header class="revenue-modal-header">
+        <div>
+          <p class="eyebrow">تحليل الإيرادات</p>
+          <h2 id="revenueModalTitle">التقرير المالي</h2>
+          <p class="revenue-modal-note">تقدير حسب قيمة الخطط وتاريخ بداية الاشتراك المسجل، وليس كشفاً بالدفعات المحصّلة.</p>
+        </div>
+        <button class="icon-button" id="closeRevenueModal" type="button" aria-label="إغلاق التقرير المالي"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </header>
+
+      <div class="revenue-toolbar">
+        <label for="revenue-year-select">السنة</label>
+        <select id="revenue-year-select" aria-label="تصفية الإيرادات حسب السنة"></select>
+        <span class="revenue-source"><i class="fa-solid fa-cloud" aria-hidden="true"></i> بيانات Supabase المباشرة</span>
+      </div>
+
+      <section class="revenue-summary-grid" aria-label="ملخص السنة المحددة">
+        <article class="revenue-summary-card revenue-summary-total">
+          <span>إجمالي دخل السنة المحددة</span>
+          <strong id="revenueAnnualTotal">0 <small>دج</small></strong>
+        </article>
+        <article class="revenue-summary-card">
+          <span>متوسط الدخل الشهري</span>
+          <strong id="revenueMonthlyAverage">0 <small>دج</small></strong>
+        </article>
+        <article class="revenue-summary-card">
+          <span>الشهر الأكثر ربحية</span>
+          <strong id="revenuePeakMonth">—</strong>
+        </article>
+      </section>
+
+      <div class="revenue-table-wrap" tabindex="0" aria-label="التقرير الشهري، مرر أفقياً عند الحاجة">
+        <table class="revenue-table">
+          <thead>
+            <tr>
+              <th scope="col">الشهر</th>
+              <th scope="col">عدد الأعضاء</th>
+              <th scope="col">أكثر خطة اشتراك</th>
+              <th scope="col">إجمالي الإيرادات (دج)</th>
+            </tr>
+          </thead>
+          <tbody id="revenue-monthly-rows"></tbody>
+        </table>
+      </div>
+
+      <footer class="revenue-modal-footer">
+        <span id="revenueReportCount" aria-live="polite">0 عضوية مسجلة</span>
+        <button class="button button-primary" id="exportRevenueCsv" type="button"><i class="fa-solid fa-file-csv" aria-hidden="true"></i> تصدير التقرير المالي (CSV)</button>
+      </footer>
+    </div>
+  </dialog>
 </body>
 </html>
