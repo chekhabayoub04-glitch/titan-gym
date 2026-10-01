@@ -15,6 +15,11 @@ const firstNames = [
   'هشام', 'جمال', 'سامي', 'مصطفى', 'نور الدين'
 ];
 
+const femaleFirstNames = [
+  'آية', 'سارة', 'مريم', 'فاطمة', 'خديجة', 'إيمان', 'سلمى', 'ياسمين', 'ليلى', 'أمينة',
+  'حياة', 'سمية', 'جميلة', 'نوال', 'لمياء', 'دنيا', 'صفاء', 'حنان', 'ريم', 'زينب'
+];
+
 const familyNames = [
   'بن علي', 'براهيمي', 'قادري', 'سلطاني', 'منصوري', 'بوزيان', 'حمودي', 'شريف',
   'عمراني', 'بلقاسم', 'زروقي', 'دراجي', 'بوخاري', 'قاسمي', 'رحماني', 'مزيان',
@@ -80,7 +85,9 @@ function makeMember(index, plan, startDate, cohort, today) {
   if (getStatus(dateString(endDate), today) !== cohort) {
     throw new Error(`Generated ${cohort} member has an invalid end date.`);
   }
-  const name = `${firstNames[index % firstNames.length]} ${familyNames[Math.floor(index / firstNames.length) % familyNames.length]}`;
+  const gender = index % 20 < 7 ? 'female' : 'male';
+  const names = gender === 'female' ? femaleFirstNames : firstNames;
+  const name = `${names[index % names.length]} ${familyNames[Math.floor(index / names.length) % familyNames.length]}`;
   const phone = `${PHONE_PREFIX}${String(index).padStart(4, '0')}`;
   const createdAt = new Date(startDate.getTime());
   createdAt.setUTCHours(10 + (index % 9), index % 60, 0, 0);
@@ -88,6 +95,7 @@ function makeMember(index, plan, startDate, cohort, today) {
   return {
     name,
     phone,
+    gender,
     plan: plan.name,
     price: plan.price,
     goal: goals[index % goals.length],
@@ -150,11 +158,13 @@ function buildDataset(today) {
 function validateDataset(rows, today) {
   const expected = { expired: 300, active: 200, expiring_soon: 100 };
   const counts = { expired: 0, active: 0, expiring_soon: 0 };
+  const genders = { male: 0, female: 0 };
   const phones = new Set();
 
   rows.forEach(member => {
     const status = getStatus(member.end_date, today);
     counts[status] += 1;
+    genders[member.gender] += 1;
     if (!member.start_date.startsWith(`${today.getUTCFullYear()}-`)) throw new Error(`Non-${today.getUTCFullYear()} start date: ${member.start_date}.`);
     if (phones.has(member.phone)) throw new Error(`Duplicate generated phone: ${member.phone}.`);
     phones.add(member.phone);
@@ -168,6 +178,9 @@ function validateDataset(rows, today) {
 
   if (JSON.stringify(counts) !== JSON.stringify(expected)) {
     throw new Error(`Generated status distribution is invalid: ${JSON.stringify(counts)}`);
+  }
+  if (genders.male !== 390 || genders.female !== 210) {
+    throw new Error(`Generated gender distribution is invalid: ${JSON.stringify(genders)}`);
   }
   return counts;
 }
@@ -217,7 +230,6 @@ async function restoreRows(supabase, rows) {
 
 async function main() {
   const { url, key } = loadSupabaseCredentials();
-  const supabase = createClient(url, key, { auth: { persistSession: false } });
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
   const rows = buildDataset(today);
@@ -229,10 +241,15 @@ async function main() {
   }, {});
 
   if (process.argv.includes('--dry-run')) {
+    const genderDistribution = rows.reduce((counts, member) => {
+      counts[member.gender] += 1;
+      return counts;
+    }, { male: 0, female: 0 });
     console.log(JSON.stringify({
       dryRun: true,
       generated: rows.length,
       statusDistribution,
+      genderDistribution,
       monthlySignupDistribution: monthlyDistribution,
       planDistribution: rows.reduce((counts, member) => {
         counts[member.plan] = (counts[member.plan] || 0) + 1;
@@ -241,6 +258,12 @@ async function main() {
     }, null, 2));
     return;
   }
+
+    const supabase = createClient(url, key, { auth: { persistSession: false } });
+    const { error: genderColumnError } = await supabase.from('members').select('gender').limit(1);
+    if (genderColumnError) {
+      throw new Error(`The gender column is not ready. Apply supabase-gender-migration.sql first. ${genderColumnError.message}`);
+    }
 
   const previousSeedRows = await fetchSeedRows(supabase);
   const deletedOldIds = [];
@@ -266,7 +289,7 @@ async function main() {
 
   const { data: seededRows, error: verifyError } = await supabase
     .from('members')
-    .select('phone, plan, price, start_date, end_date')
+    .select('phone, gender, plan, price, start_date, end_date')
     .gte('phone', `${PHONE_PREFIX}0000`)
     .lte('phone', `${PHONE_PREFIX}${String(TOTAL_MEMBERS - 1).padStart(4, '0')}`);
   if (verifyError) throw verifyError;
@@ -274,8 +297,12 @@ async function main() {
     counts[getStatus(row.end_date, today)] += 1;
     return counts;
   }, { expired: 0, active: 0, expiring_soon: 0 });
-  if (seededRows.length !== TOTAL_MEMBERS || JSON.stringify(verifiedDistribution) !== JSON.stringify(statusDistribution)) {
-    throw new Error(`Post-insert verification failed: ${seededRows.length} rows, ${JSON.stringify(verifiedDistribution)}.`);
+  const verifiedGenders = seededRows.reduce((counts, row) => {
+    counts[row.gender] = (counts[row.gender] || 0) + 1;
+    return counts;
+  }, { male: 0, female: 0 });
+  if (seededRows.length !== TOTAL_MEMBERS || JSON.stringify(verifiedDistribution) !== JSON.stringify(statusDistribution) || verifiedGenders.male !== 390 || verifiedGenders.female !== 210) {
+    throw new Error(`Post-insert verification failed: ${seededRows.length} rows, statuses ${JSON.stringify(verifiedDistribution)}, genders ${JSON.stringify(verifiedGenders)}.`);
   }
 
   const { count, error: countError } = await supabase.from('members').select('id', { count: 'exact', head: true });
@@ -291,6 +318,7 @@ async function main() {
     inserted: seededRows.length,
     totalMembersAfterReseed: count,
     statusDistribution: verifiedDistribution,
+    genderDistribution: verifiedGenders,
     monthlySignupDistribution: Object.fromEntries(Object.entries(verifiedMonthlyDistribution).sort(([first], [second]) => first.localeCompare(second))),
     batches: seededRows.length / BATCH_SIZE
   }, null, 2));

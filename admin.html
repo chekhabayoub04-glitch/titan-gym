@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="admin.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=9" defer></script>
+  <script src="admin.js?v=11" defer></script>
 </head>
 <body>
   <!-- Client-side convenience gate; protect real admin data with server-side authentication. -->
@@ -79,22 +79,32 @@
         </section>
 
         <!-- KPI values are calculated from the current member records in admin.js. -->
+        <div class="gender-switcher" role="group" aria-label="تصفية المشتركين حسب القسم">
+          <button class="gender-tab is-active" type="button" data-gender-filter="all" aria-pressed="true">الكل <span id="genderAllCount">0</span></button>
+          <button class="gender-tab" type="button" data-gender-filter="male" aria-pressed="false">قسم الرجال <span id="genderMaleCount">0</span></button>
+          <button class="gender-tab" type="button" data-gender-filter="female" aria-pressed="false">قسم النساء <span id="genderFemaleCount">0</span></button>
+        </div>
         <section class="stats-grid" aria-label="ملخص مؤشرات الصالة">
-          <article class="stat-card">
+          <button class="stat-card kpi-filter is-selected" type="button" data-member-status="all" aria-pressed="true">
             <div class="stat-top"><span class="stat-icon gold-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span><span class="stat-caption">قاعدة الأعضاء</span></div>
             <p class="stat-value" id="totalMembers">0</p>
             <h2>إجمالي المشتركين</h2>
-          </article>
-          <article class="stat-card">
+          </button>
+          <button class="stat-card kpi-filter" type="button" data-member-status="active" aria-pressed="false">
             <div class="stat-top"><span class="stat-icon green-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span><span class="stat-caption">اشتراك ساري</span></div>
             <p class="stat-value" id="activeMembers">0</p>
             <h2>الاشتراكات النشطة</h2>
-          </article>
-          <article class="stat-card">
+          </button>
+          <button class="stat-card kpi-filter" type="button" data-member-status="expiring" aria-pressed="false">
             <div class="stat-top"><span class="stat-icon amber-icon"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i></span><span class="stat-caption">خلال 7 أيام</span></div>
             <p class="stat-value" id="expiringMembers">0</p>
             <h2>تنتهي قريباً</h2>
-          </article>
+          </button>
+          <button class="stat-card kpi-filter" type="button" data-member-status="expired" aria-pressed="false">
+            <div class="stat-top"><span class="stat-icon red-icon"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i></span><span class="stat-caption">انتهى الاشتراك</span></div>
+            <p class="stat-value" id="expiredMembers">0</p>
+            <h2>المنتهية</h2>
+          </button>
           <article class="stat-card revenue-card" id="revenueAnalyticsTrigger" role="button" tabindex="0" title="اضغط لعرض التقرير المالي المفصل" aria-label="إجمالي الإيرادات. اضغط لعرض التقرير المالي المفصل" aria-haspopup="dialog" aria-controls="revenue-analytics-modal">
             <div class="stat-top"><span class="stat-icon red-icon"><i class="fa-solid fa-wallet" aria-hidden="true"></i></span><span class="stat-caption">قيمة الخطط المسجلة</span></div>
             <p class="stat-value revenue-value" id="totalRevenue">0 <small>دج</small></p>
@@ -113,10 +123,10 @@
           </div>
 
           <div class="table-toolbar">
-            <label class="search-box" for="memberSearch">
+            <label class="search-box" for="search-input">
               <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
               <span class="visually-hidden">ابحث بالاسم أو رقم الهاتف</span>
-              <input id="memberSearch" type="search" placeholder="ابحث بالاسم أو رقم الهاتف..." autocomplete="off" />
+              <input id="search-input" type="search" placeholder="ابحث بالاسم أو رقم الهاتف..." autocomplete="off" />
               <kbd>/</kbd>
             </label>
             <span class="table-hint"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> تتحدث البيانات تلقائياً</span>
@@ -127,6 +137,7 @@
               <thead>
                 <tr>
                   <th scope="col">المشترك</th>
+                  <th scope="col">القسم</th>
                   <th scope="col">رقم الهاتف</th>
                   <th scope="col">الخطة</th>
                   <th scope="col">تاريخ البداية</th>
@@ -167,6 +178,13 @@
         <div class="field field-full">
           <label for="memberPhone">رقم الهاتف <span>*</span></label>
           <input id="memberPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" minlength="6" maxlength="24" required placeholder="مثال: 0550 12 34 56" />
+        </div>
+        <div class="field field-full">
+          <label for="member-gender">القسم <span>*</span></label>
+          <select id="member-gender" name="gender" required>
+            <option value="male">قسم الرجال</option>
+            <option value="female">قسم النساء</option>
+          </select>
         </div>
         <div class="field field-full">
           <label for="member-plan">خطة الاشتراك <span>*</span></label>

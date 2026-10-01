@@ -26,6 +26,7 @@
     totalMembers: document.getElementById('totalMembers'),
     activeMembers: document.getElementById('activeMembers'),
     expiringMembers: document.getElementById('expiringMembers'),
+    expiredMembers: document.getElementById('expiredMembers'),
     totalRevenue: document.getElementById('totalRevenue'),
     revenueTrigger: document.getElementById('revenueAnalyticsTrigger'),
     revenueModal: document.getElementById('revenue-analytics-modal'),
@@ -37,7 +38,9 @@
     revenueMonthlyRows: document.getElementById('revenue-monthly-rows'),
     revenueReportCount: document.getElementById('revenueReportCount'),
     exportRevenueCsv: document.getElementById('exportRevenueCsv'),
-    search: document.getElementById('memberSearch'),
+    search: document.getElementById('search-input'),
+    genderTabs: Array.from(document.querySelectorAll('[data-gender-filter]')),
+    statusCards: Array.from(document.querySelectorAll('[data-member-status]')),
     tableBody: document.getElementById('membersTableBody'),
     emptyState: document.getElementById('emptyState'),
     emptyTitle: document.getElementById('emptyTitle'),
@@ -49,6 +52,7 @@
     saveMemberButton: document.getElementById('saveMemberButton'),
     memberName: document.getElementById('memberName'),
     memberPhone: document.getElementById('memberPhone'),
+    memberGender: document.getElementById('member-gender'),
     memberPlan: document.getElementById('member-plan'),
     startDate: document.getElementById('startDate'),
     planSummary: document.getElementById('planSummary'),
@@ -64,6 +68,8 @@
   let realtimeChannel = null;
   let realtimeFallbackTimer = null;
   let refreshPromise = null;
+  let selectedGender = 'all';
+  let selectedMemberStatus = 'all';
 
   const numberFormat = new Intl.NumberFormat('ar-DZ');
   const REVENUE_PLAN_PRICES = {
@@ -161,6 +167,7 @@
       phone,
       plan: rawPlan || planName,
       planId: String(record.planId || planMatch?.id || ''),
+      gender: normalizeGender(record.gender, name),
       planName,
       price,
       durationDays,
@@ -169,6 +176,15 @@
       goal: String(record.goal || '').trim().slice(0, 100),
       createdAt: String(record.createdAt || record.created_at || new Date().toISOString())
     };
+  }
+
+  function normalizeGender(value, name = '') {
+    if (value === 'female' || value === 'نساء') return 'female';
+    if (value === 'male' || value === 'رجال') return 'male';
+    const firstName = name.trim().split(/\s+/)[0];
+    return ['آية', 'اية', 'سارة', 'مريم', 'فاطمة', 'خديجة', 'إيمان', 'ايمان', 'سلمى', 'ياسمين', 'ليلى', 'أمينة', 'امينة', 'حياة', 'سمية', 'جميلة', 'نوال', 'لمياء', 'دنيا', 'صفاء', 'حنان', 'ريم', 'زينب', 'aya', 'sara', 'sarah', 'mariam', 'maryam', 'fatima', 'khadija', 'iman', 'salma', 'yasmin', 'leila', 'amina'].includes(firstName.toLocaleLowerCase('ar-DZ'))
+      ? 'female'
+      : 'male';
   }
 
   function createId() {
@@ -194,6 +210,7 @@
     return {
       name: member.name,
       phone: member.phone,
+      gender: member.gender,
       plan: member.planName,
       price: member.price,
       goal: member.goal || null,
@@ -343,8 +360,20 @@
 
   function getFilteredMembers() {
     const query = getSearchableText(elements.search.value.trim());
-    if (!query) return members;
-    return members.filter(member => getSearchableText(member.name).includes(query) || getSearchableText(member.phone).includes(query));
+    return members.filter(member => {
+      const matchesGender = selectedGender === 'all' || member.gender === selectedGender;
+      const matchesStatus = selectedMemberStatus === 'all' || getMemberStatus(member).key === selectedMemberStatus;
+      const matchesQuery = !query || getSearchableText(member.name).includes(query) || getSearchableText(member.phone).includes(query);
+      return matchesGender && matchesStatus && matchesQuery;
+    });
+  }
+
+  function getMembersForSelectedFilters() {
+    return members.filter(member => {
+      const matchesGender = selectedGender === 'all' || member.gender === selectedGender;
+      const matchesStatus = selectedMemberStatus === 'all' || getMemberStatus(member).key === selectedMemberStatus;
+      return matchesGender && matchesStatus;
+    });
   }
 
   function getMemberStartParts(member) {
@@ -462,20 +491,27 @@
 
   function renderStats() {
     const today = new Date();
-    const statuses = members.map(member => getMemberStatus(member, today));
-    const activeCount = statuses.filter(status => status.key !== 'expired').length;
+    const scopedMembers = members.filter(member => selectedGender === 'all' || member.gender === selectedGender);
+    const statuses = scopedMembers.map(member => getMemberStatus(member, today));
+    const activeCount = statuses.filter(status => status.key === 'active').length;
     const expiringCount = statuses.filter(status => status.key === 'expiring').length;
+    const expiredCount = statuses.filter(status => status.key === 'expired').length;
     // This is the total value of all recorded plans, not verified cash received.
     const revenue = members.reduce((total, member) => total + member.price, 0);
 
-    elements.totalMembers.textContent = numberFormat.format(members.length);
+    elements.totalMembers.textContent = numberFormat.format(scopedMembers.length);
     elements.activeMembers.textContent = numberFormat.format(activeCount);
     elements.expiringMembers.textContent = numberFormat.format(expiringCount);
+    elements.expiredMembers.textContent = numberFormat.format(expiredCount);
     elements.totalRevenue.innerHTML = `${numberFormat.format(revenue)} <small>دج</small>`;
+    document.getElementById('genderAllCount').textContent = numberFormat.format(members.length);
+    document.getElementById('genderMaleCount').textContent = numberFormat.format(members.filter(member => member.gender === 'male').length);
+    document.getElementById('genderFemaleCount').textContent = numberFormat.format(members.filter(member => member.gender === 'female').length);
   }
 
   function renderMembers() {
     const filteredMembers = getFilteredMembers();
+    const scopedMembers = getMembersForSelectedFilters();
     const today = new Date();
 
     elements.tableBody.innerHTML = filteredMembers.map(member => {
@@ -487,6 +523,7 @@
       const safeInitial = escapeHtml(initials);
       return `<tr>
         <td><div class="member-cell"><span class="member-avatar" aria-hidden="true">${safeInitial}</span><span class="member-name">${safeName}</span></div></td>
+        <td><span class="gender-badge gender-${member.gender}">${member.gender === 'female' ? 'نساء' : 'رجال'}</span></td>
         <td class="phone-cell" dir="ltr">${safePhone}</td>
         <td>${safePlanName}<span class="plan-price">${numberFormat.format(member.price)} دج · ${numberFormat.format(member.durationDays)} يوم</span></td>
         <td>${formatDate(member.startDate)}</td>
@@ -506,7 +543,9 @@
     elements.emptyTitle.textContent = hasMembers ? 'لا توجد نتائج مطابقة' : 'لا يوجد مشتركون بعد';
     elements.emptyMessage.textContent = hasMembers ? 'جرّب البحث باسم أو رقم هاتف مختلف.' : 'أضف أول مشترك لبدء إدارة سجلات الصالة.';
     document.getElementById('emptyAddButton').hidden = hasMembers;
-    elements.visibleCount.textContent = `${numberFormat.format(filteredMembers.length)} من ${numberFormat.format(members.length)} مشترك`;
+    const genderLabel = selectedGender === 'female' ? 'قسم النساء' : selectedGender === 'male' ? 'قسم الرجال' : 'كل الأقسام';
+    const statusLabel = selectedMemberStatus === 'all' ? '' : ` · ${selectedMemberStatus === 'active' ? 'نشطة' : selectedMemberStatus === 'expiring' ? 'قريبة الانتهاء' : 'منتهية'}`;
+    elements.visibleCount.textContent = `عرض ${numberFormat.format(filteredMembers.length)} من أصل ${numberFormat.format(scopedMembers.length)} ${selectedGender === 'female' ? 'مشتركة' : 'مشترك'} · ${genderLabel}${statusLabel}`;
   }
 
   function renderAll() {
@@ -528,12 +567,13 @@
     }
 
     try {
-      const headers = ['الاسم', 'رقم الهاتف', 'الخطة', 'السعر (دج)', 'الهدف', 'تاريخ البدء', 'تاريخ الانتهاء', 'الحالة'];
+      const headers = ['الاسم', 'القسم', 'رقم الهاتف', 'الخطة', 'السعر (دج)', 'الهدف', 'تاريخ البدء', 'تاريخ الانتهاء', 'الحالة'];
       const today = new Date();
       const rows = members.map(member => {
         const status = getMemberStatus(member, today);
         return [
           member.name,
+          member.gender === 'female' ? 'نساء' : 'رجال',
           member.phone,
           member.planName || member.plan,
           member.price,
@@ -653,10 +693,12 @@
     if (member) {
       elements.memberName.value = member.name;
       elements.memberPhone.value = member.phone;
+      elements.memberGender.value = normalizeGender(member.gender, member.name);
       elements.memberPlan.value = member.planId || 'one-month';
       if (elements.memberPlan.selectedIndex < 0) elements.memberPlan.value = 'one-month';
       elements.startDate.value = member.startDate;
     } else {
+      elements.memberGender.value = 'male';
       elements.memberPlan.value = 'one-month';
       elements.startDate.value = localDateString();
     }
@@ -698,6 +740,28 @@
 
   document.getElementById('openMemberDialog').addEventListener('click', () => openMemberDialog());
   document.getElementById('emptyAddButton').addEventListener('click', () => openMemberDialog());
+  elements.genderTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      selectedGender = tab.dataset.genderFilter;
+      elements.genderTabs.forEach(item => {
+        const active = item === tab;
+        item.classList.toggle('is-active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      renderAll();
+    });
+  });
+  elements.statusCards.forEach(card => {
+    card.addEventListener('click', () => {
+      selectedMemberStatus = card.dataset.memberStatus;
+      elements.statusCards.forEach(item => {
+        const active = item === card;
+        item.classList.toggle('is-selected', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      renderMembers();
+    });
+  });
   window.exportMembersToCSV = exportMembersToCSV;
   elements.revenueTrigger.addEventListener('click', () => {
     renderRevenueAnalytics();
@@ -740,6 +804,7 @@
       id: existingMember ? existingMember.id : createId(),
       name: elements.memberName.value,
       phone: elements.memberPhone.value,
+      gender: elements.memberGender.value,
       planId: selectedOption.value,
       planName: selectedOption.textContent.split('—')[0].trim(),
       plan: selectedOption.textContent.split('—')[0].trim(),

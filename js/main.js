@@ -486,6 +486,7 @@ document.head.appendChild(style);
   if (!form) return;
 
   const nameInput = document.getElementById('joinName');
+  const genderSelect = document.getElementById('client-gender');
   const phoneInput = document.getElementById('joinPhone');
   const planSelect = document.getElementById('client-plan');
   const goalSelect = document.getElementById('client-goal');
@@ -523,7 +524,7 @@ document.head.appendChild(style);
     input.removeAttribute('aria-invalid');
   }
 
-  [nameInput, phoneInput, planSelect, goalSelect].forEach(input => {
+  [nameInput, genderSelect, phoneInput, planSelect, goalSelect].forEach(input => {
     input.addEventListener('input', () => clearInvalidState(input));
     input.addEventListener('change', () => clearInvalidState(input));
   });
@@ -536,6 +537,7 @@ document.head.appendChild(style);
     feedback.className = 'join-feedback';
 
     const name = nameInput.value.replace(/[\u0000-\u001f\u007f]/g, '').replace(/\s+/g, ' ').trim();
+    const gender = genderSelect.value;
     const phone = phoneInput.value.trim();
     const selectedPlan = planSelect.selectedOptions[0];
     const goal = goalSelect.value.trim();
@@ -547,6 +549,7 @@ document.head.appendChild(style);
 
     const validations = [
       { input: nameInput, valid: name.length >= 2, message: 'أدخل الاسم الكامل (حرفان على الأقل).' },
+      { input: genderSelect, valid: ['male', 'female'].includes(gender), message: 'اختر القسم المناسب.' },
       { input: phoneInput, valid: phonePattern.test(phone), message: 'أدخل رقم هاتف جزائري صحيحاً مثل 0550123456.' },
       { input: planSelect, valid: Boolean(plan) && Number.isFinite(price) && Number.isInteger(days) && days > 0, message: 'اختر خطة عضوية صالحة.' },
       { input: goalSelect, valid: Boolean(goal), message: 'اختر هدفك التدريبي.' }
@@ -585,6 +588,7 @@ document.head.appendChild(style);
     try {
       const { error } = await client.from('members').insert({
         name,
+        gender,
         phone,
         plan,
         price: Number(price),
@@ -596,7 +600,7 @@ document.head.appendChild(style);
       if (error) throw error;
 
       form.reset();
-      [nameInput, phoneInput, planSelect, goalSelect].forEach(input => input.removeAttribute('aria-invalid'));
+      [nameInput, genderSelect, phoneInput, planSelect, goalSelect].forEach(input => input.removeAttribute('aria-invalid'));
       showFeedback('تم تسجيل طلب عضويتك بنجاح في Titan Gym!', 'success');
     } catch (error) {
       console.error('Titan Gym registration failed:', error);

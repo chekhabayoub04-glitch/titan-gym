@@ -620,6 +620,13 @@
           <input id="joinName" name="name" type="text" autocomplete="name" maxlength="80" required placeholder="اكتب اسمك الكامل" />
         </div>
         <div class="join-field">
+          <label for="client-gender">القسم <span>*</span></label>
+          <select id="client-gender" name="gender" required>
+            <option value="male">قسم الرجال</option>
+            <option value="female">قسم النساء</option>
+          </select>
+        </div>
+        <div class="join-field">
           <label for="joinPhone">رقم الهاتف <span>*</span></label>
           <input id="joinPhone" name="phone" type="tel" dir="ltr" inputmode="numeric" autocomplete="tel-national" pattern="0[567][0-9]{8}" maxlength="10" required aria-describedby="joinPhoneHint" placeholder="0550123456" />
           <small id="joinPhoneHint">رقم جزائري يبدأ بـ 05 أو 06 أو 07، من 10 أرقام.</small>
@@ -705,6 +712,6 @@
 <button class="back-to-top" id="backTop"><i class="fas fa-chevron-up"></i></button>
 <div class="join-toast" id="joinToast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-<script src="js/main.js?v=7"></script>
+<script src="js/main.js?v=8"></script>
 </body>
 </html>
