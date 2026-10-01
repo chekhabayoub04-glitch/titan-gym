@@ -359,6 +359,9 @@
   }
 
   function getMemberRevenue(member) {
+    const planName = getMemberPlanName(member);
+    if (Object.hasOwn(REVENUE_PLAN_PRICES, planName)) return REVENUE_PLAN_PRICES[planName];
+
     const hasStoredPrice = member.price !== null && member.price !== undefined && member.price !== '';
     const storedPrice = Number(member.price);
     if (hasStoredPrice && Number.isFinite(storedPrice) && storedPrice >= 0) return storedPrice;
