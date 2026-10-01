@@ -1,0 +1,10 @@
+{
+  "name": "titan-gym",
+  "private": true,
+  "scripts": {
+    "seed:members": "node seed-members.js"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.117.2"
+  }
+}
